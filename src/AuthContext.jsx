@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const API = "https://fsa-jwt-practice.herokuapp.com";
 // The locations, add to here if addinig another location
@@ -9,7 +9,14 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState();
   const [location, setLocation] = useState(LOCATIONS.gate);
 
-  // TODO: signup
+  // If there is token in storage, load it
+  useEffect(() => {
+    if (sessionStorage.getItem("token")) {
+      setToken(sessionStorage.getItem("token"));
+      setLocation(LOCATIONS.tablet);
+    }
+  }, []);
+
   async function signup(username) {
     try {
       const req = await fetch(API + "/signup", {
@@ -19,14 +26,15 @@ export function AuthProvider({ children }) {
       });
       const result = await req.json();
       if (req.ok) {
+        sessionStorage.setItem("token", result.token);
         setToken(result.token);
         setLocation(LOCATIONS.tablet);
       }
     } catch (e) {
-      console.log("Error:", e);
+      console.log("Error signing in:", e);
     }
   }
-  // TODO: authenticate
+
   async function authenticate() {
     try {
       if (!token) throw Error("No token");
