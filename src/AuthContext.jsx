@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (sessionStorage.getItem("token")) {
       setToken(sessionStorage.getItem("token"));
-      setLocation(LOCATIONS.tablet);
+      // setLocation(LOCATIONS.tablet);
     }
   }, []);
 
@@ -29,6 +29,8 @@ export function AuthProvider({ children }) {
         sessionStorage.setItem("token", result.token);
         setToken(result.token);
         setLocation(LOCATIONS.tablet);
+      } else {
+        alert("Something went wrong! Request status code: " + req.status);
       }
     } catch (e) {
       console.log("Error signing in:", e);
@@ -42,7 +44,11 @@ export function AuthProvider({ children }) {
         method: "GET",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
       });
-      if (req.ok) setLocation(LOCATIONS.tunnel);
+      if (req.ok) {
+        setLocation(LOCATIONS.tunnel);
+      } else {
+        alert("Something went wrong! Request status code: " + req.status);
+      }
     } catch (e) {
       console.log(e);
     }
